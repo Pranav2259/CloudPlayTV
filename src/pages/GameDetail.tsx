@@ -10,7 +10,7 @@ const gameData = {
   id: 'game1',
   title: 'Cyber Odyssey 2077',
   description: 'Embark on an epic adventure in a futuristic open world. Battle corporations, customize your character, and change the fate of the city. With branching storylines and deep character progression, every choice matters in this immersive RPG experience.',
-  longDescription: 'In Cyber Odyssey 2077, you take on the role of V, a mercenary outlaw going after a one-of-a-kind implant that is the key to immortality. You can customize your character's cyberware, skillset and playstyle, and explore a vast city where the choices you make shape the story and the world around you.\n\nFeaturing a non-linear storyline, player-driven choices, and multiple endings, this open-world adventure redefines the gaming experience with its detailed character creation, deep progression systems, and stunning visual design.',
+  longDescription: "In Cyber Odyssey 2077, you take on the role of V, a mercenary outlaw going after a one-of-a-kind implant that is the key to immortality. You can customize your character's cyberware, skillset and playstyle, and explore a vast city where the choices you make shape the story and the world around you.\n\nFeaturing a non-linear storyline, player-driven choices, and multiple endings, this open-world adventure redefines the gaming experience with its detailed character creation, deep progression systems, and stunning visual design.",
   image: 'https://via.placeholder.com/1200x500/0F172A/60A5FA?text=Cyber+Odyssey+2077',
   rating: 4.7,
   releaseDate: 'June 15, 2023',
