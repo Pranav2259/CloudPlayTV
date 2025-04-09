@@ -1,8 +1,9 @@
-
 import React, { useState } from 'react';
 import { TVLayout } from '../components/layout/TVLayout';
-import { Search, Filter, Grid3X3, List } from 'lucide-react';
+import { Search, Filter, Grid3X3, List, Download } from 'lucide-react';
 import { GameGrid } from '../components/games/GameGrid';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 // Mock game data
 const allGames = [
@@ -58,7 +59,7 @@ export default function Library() {
       <div className="h-full flex flex-col overflow-hidden">
         {/* Search and filter bar */}
         <div className="bg-card p-6 border-b border-muted">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex-1 max-w-xl relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3">
                 <Search className="h-5 w-5 text-muted-foreground" />
@@ -74,6 +75,17 @@ export default function Library() {
             </div>
             
             <div className="flex items-center space-x-4 ml-4">
+              <Link to="/library/import">
+                <Button
+                  variant="outline"
+                  className="flex items-center space-x-2 focus:tv-focus"
+                  tabIndex={0}
+                >
+                  <Download className="h-5 w-5" />
+                  <span>Import Games</span>
+                </Button>
+              </Link>
+              
               <button
                 className={`p-3 rounded-lg ${isFilterOpen ? 'bg-cloud text-white' : 'bg-muted'} focus:tv-focus`}
                 onClick={() => setIsFilterOpen(!isFilterOpen)}

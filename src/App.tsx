@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Library from "./pages/Library";
+import LibraryImport from "./pages/LibraryImport";
 import Settings from "./pages/Settings";
 import GameDetail from "./pages/GameDetail";
 import Auth from "./pages/Auth";
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<Index />} />
           <Route path="/library" element={<Library />} />
+          <Route path="/library/import" element={<LibraryImport />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/game/:id" element={<GameDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
