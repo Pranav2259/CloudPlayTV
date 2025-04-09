@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { TVLayout } from '../components/layout/TVLayout';
-import { User, Users, CreditCard, Gamepad2, Display, BellRing, Shield, HelpCircle, LogOut } from 'lucide-react';
+import { User, Users, CreditCard, Gamepad2, Monitor, BellRing, Shield, HelpCircle, LogOut } from 'lucide-react';
 
 export default function Settings() {
   const [selectedTab, setSelectedTab] = useState('profile');
@@ -13,7 +12,7 @@ export default function Settings() {
     { id: 'family', name: 'Family & Profiles', icon: Users },
     { id: 'credit', name: 'Credit & Billing', icon: CreditCard },
     { id: 'controllers', name: 'Controllers', icon: Gamepad2 },
-    { id: 'display', name: 'Display & Sound', icon: Display },
+    { id: 'display', name: 'Display & Sound', icon: Monitor },
     { id: 'notifications', name: 'Notifications', icon: BellRing },
     { id: 'privacy', name: 'Privacy & Security', icon: Shield },
     { id: 'help', name: 'Help & Support', icon: HelpCircle },
