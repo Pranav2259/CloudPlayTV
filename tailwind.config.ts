@@ -63,17 +63,17 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-                // CloudPlay custom colors
+                // Custom colors - updated to gray shades
                 cloud: {
-                    DEFAULT: '#3B82F6', // Primary blue
-                    dark: '#1E40AF',
-                    light: '#93C5FD',
-                    focus: '#60A5FA'
+                    DEFAULT: '#6B7280', // Gray-500
+                    dark: '#4B5563',    // Gray-600
+                    light: '#9CA3AF',   // Gray-400
+                    focus: '#D1D5DB'    // Gray-300
                 },
                 gaming: {
-                    DEFAULT: '#10B981', // Secondary green
-                    dark: '#065F46',
-                    light: '#6EE7B7'
+                    DEFAULT: '#6B7280', // Gray-500
+                    dark: '#374151',    // Gray-700
+                    light: '#9CA3AF'    // Gray-400
                 }
 			},
 			borderRadius: {
@@ -98,14 +98,6 @@ export default {
 						height: '0'
 					}
 				},
-                'pulse-glow': {
-                    '0%, 100%': { 
-                        boxShadow: '0 0 12px 2px rgba(96, 165, 250, 0.7)'
-                    },
-                    '50%': { 
-                        boxShadow: '0 0 20px 6px rgba(96, 165, 250, 0.9)'
-                    }
-                },
                 'fade-in': {
                     '0%': { 
                         opacity: '0',
@@ -136,7 +128,6 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-                'pulse-glow': 'pulse-glow 2s infinite ease-in-out',
                 'fade-in': 'fade-in 0.3s ease-out',
                 'scale-up': 'scale-up 0.2s ease-out',
                 'slide-left': 'slide-left 0.3s ease-out'

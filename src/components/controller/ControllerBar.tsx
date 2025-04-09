@@ -1,34 +1,57 @@
 
 import React, { useState } from 'react';
-import { Gamepad2, ChevronDown, User, UserPlus } from 'lucide-react';
+import { Gamepad } from 'lucide-react';
 import { ControllerDropdown } from './ControllerDropdown';
+
+interface Controller {
+  id: string;
+  name: string;
+  user: string;
+  status: "connected" | "disconnected";
+  battery: number;
+}
 
 export const ControllerBar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   // Mock controller data
-  const controllers = [
-    { id: 'controller1', name: 'Controller 1', user: 'Player 1', status: 'connected', battery: 80 },
-    { id: 'controller2', name: 'Controller 2', user: 'Player 2', status: 'connected', battery: 45 },
-    { id: 'controller3', name: 'Controller 3', user: null, status: 'disconnected', battery: 0 },
+  const controllers: Controller[] = [
+    {
+      id: 'controller1',
+      name: 'Xbox Controller',
+      user: 'Player 1',
+      status: "connected",
+      battery: 85
+    },
+    {
+      id: 'controller2',
+      name: 'PlayStation Controller',
+      user: 'Player 2',
+      status: "connected",
+      battery: 62
+    },
+    {
+      id: 'controller3',
+      name: 'Switch Controller',
+      user: 'Guest',
+      status: "disconnected",
+      battery: 20
+    }
   ];
-
-  const connectedControllers = controllers.filter(c => c.status === 'connected');
+  
+  const connectedCount = controllers.filter(c => c.status === "connected").length;
 
   return (
     <div className="relative">
       <button 
-        className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${isDropdownOpen ? 'bg-muted' : ''}`}
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-muted hover:bg-muted/80"
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        onKeyDown={(e) => e.key === 'Enter' && setIsDropdownOpen(!isDropdownOpen)}
+        aria-label="Controller status"
         tabIndex={0}
       >
-        <div className="flex items-center">
-          <Gamepad2 className="h-6 w-6 text-cloud" />
-          <span className="ml-2 font-medium">{connectedControllers.length}</span>
-        </div>
-        <ChevronDown className={`h-4 w-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+        <Gamepad className="h-5 w-5" />
+        <span>{connectedCount}</span>
       </button>
-
+      
       {isDropdownOpen && <ControllerDropdown controllers={controllers} onClose={() => setIsDropdownOpen(false)} />}
     </div>
   );

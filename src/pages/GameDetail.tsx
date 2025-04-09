@@ -179,7 +179,7 @@ export default function GameDetail() {
               <div className="bg-card rounded-xl p-6 mb-6">
                 <h3 className="text-xl font-bold mb-4">Play Now</h3>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-muted-foreground">Cost per session:</span>
+                  <span className="text-muted-foreground">Cost per hour:</span>
                   <span className="credit-amount">{game.creditCost}</span>
                 </div>
                 
@@ -190,7 +190,7 @@ export default function GameDetail() {
                 
                 <Link
                   to={`/game/${game.id}/play`}
-                  className="tv-btn w-full bg-cloud hover:bg-cloud-dark text-white flex items-center justify-center"
+                  className="tv-btn w-full bg-gray-700 hover:bg-gray-600 text-white flex items-center justify-center"
                   tabIndex={0}
                 >
                   <Play className="h-5 w-5 mr-2" />

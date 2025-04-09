@@ -1,19 +1,18 @@
+
 import React, { useState } from 'react';
 import { TVLayout } from '../components/layout/TVLayout';
-import { User, Users, CreditCard, Gamepad2, Monitor, BellRing, Shield, HelpCircle, LogOut } from 'lucide-react';
+import { User, CreditCard, Gamepad2, Monitor, Shield, HelpCircle, LogOut } from 'lucide-react';
 
 export default function Settings() {
   const [selectedTab, setSelectedTab] = useState('profile');
   const [focusedSettingIndex, setFocusedSettingIndex] = useState(0);
   
-  // Settings categories
+  // Settings categories (removed family and notifications)
   const settingsCategories = [
     { id: 'profile', name: 'User Profile', icon: User },
-    { id: 'family', name: 'Family & Profiles', icon: Users },
     { id: 'credit', name: 'Credit & Billing', icon: CreditCard },
     { id: 'controllers', name: 'Controllers', icon: Gamepad2 },
     { id: 'display', name: 'Display & Sound', icon: Monitor },
-    { id: 'notifications', name: 'Notifications', icon: BellRing },
     { id: 'privacy', name: 'Privacy & Security', icon: Shield },
     { id: 'help', name: 'Help & Support', icon: HelpCircle },
   ];
@@ -61,9 +60,9 @@ export default function Settings() {
                   id={`setting-${index}`}
                   className={`w-full flex items-center py-3 px-4 rounded-lg transition-colors ${
                     selectedTab === category.id
-                      ? 'bg-cloud text-white'
+                      ? 'bg-gray-700 text-white'
                       : 'hover:bg-muted'
-                  } ${focusedSettingIndex === index ? 'tv-focus' : ''}`}
+                  } ${focusedSettingIndex === index ? 'outline-none ring-2 ring-gray-500' : ''}`}
                   onClick={() => setSelectedTab(category.id)}
                   onFocus={() => setFocusedSettingIndex(index)}
                   onKeyDown={(e) => handleKeyNavigation(e, index)}
@@ -77,7 +76,7 @@ export default function Settings() {
             
             <div className="mt-auto pt-6 border-t border-muted mt-8">
               <button
-                className="w-full flex items-center py-3 px-4 rounded-lg text-red-500 hover:bg-muted focus:tv-focus"
+                className="w-full flex items-center py-3 px-4 rounded-lg text-red-500 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-gray-500"
                 tabIndex={0}
               >
                 <LogOut className="h-5 w-5 mr-3" />
@@ -114,7 +113,7 @@ export default function Settings() {
                         <div className="flex items-center">
                           <span>{userData.name}</span>
                           <button 
-                            className="ml-3 text-cloud hover:underline focus:tv-focus-text"
+                            className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                             tabIndex={0}
                           >
                             Edit
@@ -130,7 +129,7 @@ export default function Settings() {
                         <div className="flex items-center">
                           <span>{userData.avatar}</span>
                           <button 
-                            className="ml-3 text-cloud hover:underline focus:tv-focus-text"
+                            className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                             tabIndex={0}
                           >
                             Change
@@ -146,7 +145,7 @@ export default function Settings() {
                       <div className="p-4 flex justify-between items-center">
                         <span className="text-muted-foreground">Password</span>
                         <button 
-                          className="text-cloud hover:underline focus:tv-focus-text"
+                          className="text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                           tabIndex={0}
                         >
                           Change Password
@@ -155,7 +154,7 @@ export default function Settings() {
                       <div className="p-4 flex justify-between items-center">
                         <span className="text-muted-foreground">Two-Factor Authentication</span>
                         <button 
-                          className="text-cloud hover:underline focus:tv-focus-text"
+                          className="text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                           tabIndex={0}
                         >
                           Enable
@@ -174,7 +173,7 @@ export default function Settings() {
                         <div className="flex items-center">
                           <span>{userData.language}</span>
                           <button 
-                            className="ml-3 text-cloud hover:underline focus:tv-focus-text"
+                            className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                             tabIndex={0}
                           >
                             Change
@@ -186,7 +185,7 @@ export default function Settings() {
                         <div className="flex items-center">
                           <span>{userData.timezone}</span>
                           <button 
-                            className="ml-3 text-cloud hover:underline focus:tv-focus-text"
+                            className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                             tabIndex={0}
                           >
                             Change
@@ -198,7 +197,7 @@ export default function Settings() {
                         <div className="flex items-center">
                           <span>{userData.parental}</span>
                           <button 
-                            className="ml-3 text-cloud hover:underline focus:tv-focus-text"
+                            className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                             tabIndex={0}
                           >
                             Setup
@@ -211,7 +210,7 @@ export default function Settings() {
                   <div>
                     <h3 className="text-lg font-medium mb-3">Connected Accounts</h3>
                     <button 
-                      className="w-full py-3 bg-muted rounded-lg text-center hover:bg-muted/80 focus:tv-focus"
+                      className="w-full py-3 bg-muted rounded-lg text-center hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-gray-500"
                       tabIndex={0}
                     >
                       Connect Social Accounts
@@ -221,7 +220,7 @@ export default function Settings() {
                   <div>
                     <h3 className="text-lg font-medium mb-3">Delete Account</h3>
                     <button 
-                      className="w-full py-3 bg-red-500/10 text-red-500 rounded-lg text-center hover:bg-red-500/20 focus:tv-focus"
+                      className="w-full py-3 bg-red-500/10 text-red-500 rounded-lg text-center hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-500"
                       tabIndex={0}
                     >
                       Delete My Account
@@ -239,7 +238,7 @@ export default function Settings() {
               } Settings</h2>
               <p className="text-muted-foreground mb-8">This settings section is not implemented in the demo.</p>
               <button 
-                className="tv-btn bg-cloud text-white"
+                className="tv-btn bg-gray-700 text-white"
                 onClick={() => setSelectedTab('profile')}
                 tabIndex={0}
               >

@@ -35,7 +35,7 @@ export const CreditMenu: React.FC<CreditMenuProps> = ({ credits, timeRemaining, 
       <div className="p-4">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center">
-            <CreditCard className="h-5 w-5 text-cloud mr-2" />
+            <CreditCard className="h-5 w-5 text-gray-400 mr-2" />
             <span className="font-medium">Available:</span>
           </div>
           <span className="text-xl font-bold">{credits}</span>
@@ -43,7 +43,7 @@ export const CreditMenu: React.FC<CreditMenuProps> = ({ credits, timeRemaining, 
         
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
-            <Clock className="h-5 w-5 text-gaming mr-2" />
+            <Clock className="h-5 w-5 text-gray-400 mr-2" />
             <span className="font-medium">Play time:</span>
           </div>
           <span className="text-lg">{timeRemaining}</span>
@@ -56,8 +56,8 @@ export const CreditMenu: React.FC<CreditMenuProps> = ({ credits, timeRemaining, 
             <button 
               key={pkg.id}
               className={`w-full py-3 px-4 rounded-lg flex justify-between items-center transition-all ${
-                pkg.popular ? 'bg-cloud text-white' : 'bg-muted hover:bg-muted/80'
-              } focus:tv-focus`}
+                pkg.popular ? 'bg-gray-600 text-white' : 'bg-muted hover:bg-muted/80'
+              } focus:outline-none focus:ring-2 focus:ring-gray-500`}
               tabIndex={0}
             >
               <div className="flex items-center">
@@ -72,7 +72,7 @@ export const CreditMenu: React.FC<CreditMenuProps> = ({ credits, timeRemaining, 
         <div className="mt-4 pt-4 border-t border-muted">
           <Link 
             to="/credits"
-            className="block w-full py-2 text-center text-cloud hover:underline focus:tv-focus-text"
+            className="block w-full py-2 text-center text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
             onClick={onClose}
             tabIndex={0}
           >
