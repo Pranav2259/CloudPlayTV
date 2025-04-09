@@ -1,92 +1,48 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 217 33% 17%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 222 47% 11%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 162 75% 40%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 217 33% 25%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 217 91% 60%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62% 30%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: 217 33% 25%;
+    --input: 217 33% 25%;
+    --ring: 224 76% 48%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 224 76% 48%;
   }
 }
 
@@ -96,6 +52,102 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    /* 10pt minimum for TV interfaces */
+    font-size: 18px;
   }
+
+  /* Optimize for TV viewing */
+  h1 {
+    @apply text-4xl font-bold mb-6;
+  }
+
+  h2 {
+    @apply text-3xl font-bold mb-4;
+  }
+
+  h3 {
+    @apply text-2xl font-bold mb-3;
+  }
+
+  p {
+    @apply text-lg mb-4;
+  }
+}
+
+/* TV Specific Navigation Focus States */
+@layer utilities {
+  .tv-focus {
+    @apply outline-none ring-2 ring-cloud-focus ring-offset-2 ring-offset-background transition-all duration-200 animate-pulse-glow scale-105;
+  }
+
+  .tv-focus-text {
+    @apply text-cloud font-medium;
+  }
+
+  .game-card {
+    @apply rounded-xl overflow-hidden transition-all duration-200;
+  }
+
+  .game-card:focus, 
+  .game-card:focus-within {
+    @apply tv-focus scale-110 z-10;
+  }
+
+  .credits-display {
+    @apply bg-gradient-to-r from-blue-600 to-cloud-light text-white rounded-lg px-4 py-2 font-bold text-lg;
+  }
+
+  /* Enhances visibility of focus states */
+  .focus-visible:focus {
+    @apply tv-focus;
+  }
+
+  /* Controller connection indicator */
+  .controller-connected {
+    @apply bg-gaming text-white;
+  }
+
+  .controller-disconnected {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  /* Create a gradient overlay for game cards */
+  .game-card-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent;
+  }
+
+  /* Custom scrollbar for TV interfaces (minimal) */
+  .tv-scrollbar {
+    @apply scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent;
+  }
+
+  /* Base Button styles optimized for TV */
+  .tv-btn {
+    @apply px-6 py-4 rounded-lg text-lg font-medium transition-all duration-200;
+  }
+
+  .tv-btn:focus {
+    @apply tv-focus;
+  }
+
+  /* Game category pills */
+  .game-category {
+    @apply px-4 py-2 rounded-full text-sm font-medium bg-muted text-white mr-2 mb-2 inline-block;
+  }
+
+  /* Credit amount pill */
+  .credit-amount {
+    @apply px-4 py-2 rounded-full bg-cloud text-white font-bold;
+  }
+}
+
+#root {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
