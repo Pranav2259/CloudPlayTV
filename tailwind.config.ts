@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -70,9 +69,9 @@ export default {
                     focus: '#EB5B00'
                 },
                 gaming: {
-                    DEFAULT: '#2C3E50',  // Darker slate blue instead of pure blue
-                    dark: '#1A2530',     // Even darker slate for contrast
-                    light: '#A0C878'     // Keeping the green accent
+                    DEFAULT: '#143D60',
+                    dark: '#0A2540',
+                    light: '#A0C878'
                 }
 			},
 			borderRadius: {
