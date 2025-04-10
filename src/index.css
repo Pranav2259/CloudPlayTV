@@ -5,44 +5,44 @@
 
 @layer base {
   :root {
-    --background: 215 15% 16%;
-    --foreground: 210 20% 98%;
+    --background: 213 79% 23%; /* #143D60 dark blue background */
+    --foreground: 210 20% 98%; /* Light text color */
 
-    --card: 220 13% 18%;
+    --card: 213 65% 28%; /* Slightly lighter than background for cards */
     --card-foreground: 210 20% 98%;
 
-    --popover: 220 13% 18%;
+    --popover: 213 65% 28%;
     --popover-foreground: 210 20% 98%;
 
-    --primary: 215 15% 65%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 90 52% 63%; /* #A0C878 green */
+    --primary-foreground: 213 79% 23%; /* Dark blue text on light bg */
 
-    --secondary: 215 15% 30%;
-    --secondary-foreground: 210 20% 98%;
+    --secondary: 74 56% 77%; /* #DDEB9D light green */
+    --secondary-foreground: 213 79% 23%;
 
-    --muted: 215 15% 25%;
-    --muted-foreground: 215 10% 65%;
+    --muted: 213 60% 35%;
+    --muted-foreground: 74 30% 90%;
 
-    --accent: 215 15% 65%;
+    --accent: 22 100% 46%; /* #EB5B00 orange */
     --accent-foreground: 210 20% 98%;
 
     --destructive: 0 62% 30%;
     --destructive-foreground: 210 20% 98%;
 
-    --border: 215 15% 25%;
-    --input: 215 15% 25%;
-    --ring: 215 15% 65%;
+    --border: 213 34% 40%;
+    --input: 213 34% 40%;
+    --ring: 90 52% 63%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 220 13% 18%;
+    --sidebar-background: 213 79% 18%;
     --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 215 15% 65%;
+    --sidebar-primary: 90 52% 63%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 15% 16%;
+    --sidebar-accent: 213 79% 16%;
     --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 215 15% 16%;
-    --sidebar-ring: 215 15% 65%;
+    --sidebar-border: 213 79% 16%;
+    --sidebar-ring: 90 52% 63%;
   }
 }
 
@@ -78,11 +78,11 @@
 /* TV Specific Navigation Focus States */
 @layer utilities {
   .tv-focus {
-    @apply outline-none ring-2 ring-gray-500 ring-offset-2 ring-offset-background transition-all duration-200 scale-105;
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-background transition-all duration-200 scale-105;
   }
 
   .tv-focus-text {
-    @apply text-gray-300 font-medium;
+    @apply text-secondary font-medium;
   }
 
   .game-card {
@@ -95,7 +95,7 @@
   }
 
   .credits-display {
-    @apply bg-gradient-to-r from-gray-600 to-gray-500 text-white rounded-lg px-4 py-2 font-bold text-lg;
+    @apply bg-gradient-to-r from-primary to-secondary text-background rounded-lg px-4 py-2 font-bold text-lg;
   }
 
   /* Enhances visibility of focus states */
@@ -105,7 +105,7 @@
 
   /* Controller connection indicator */
   .controller-connected {
-    @apply bg-gray-500 text-white;
+    @apply bg-primary text-background;
   }
 
   .controller-disconnected {
@@ -114,7 +114,7 @@
 
   /* Create a gradient overlay for game cards */
   .game-card-overlay {
-    @apply absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent;
+    @apply absolute inset-0 bg-gradient-to-t from-gaming/80 via-gaming/40 to-transparent;
   }
 
   /* Custom scrollbar for TV interfaces (minimal) */
@@ -148,12 +148,12 @@
 
   /* Game category pills */
   .game-category {
-    @apply px-4 py-2 rounded-full text-sm font-medium bg-gray-700 text-white mr-2 mb-2 inline-block;
+    @apply px-4 py-2 rounded-full text-sm font-medium bg-primary text-background mr-2 mb-2 inline-block;
   }
 
   /* Credit amount pill */
   .credit-amount {
-    @apply px-4 py-2 rounded-full bg-gray-600 text-white font-bold;
+    @apply px-4 py-2 rounded-full bg-primary text-background font-bold;
   }
 }
 

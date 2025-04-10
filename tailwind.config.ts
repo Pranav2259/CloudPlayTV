@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -63,17 +62,16 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-                // Custom colors - updated to gray shades
                 cloud: {
-                    DEFAULT: '#6B7280', // Gray-500
-                    dark: '#4B5563',    // Gray-600
-                    light: '#9CA3AF',   // Gray-400
-                    focus: '#D1D5DB'    // Gray-300
+                    DEFAULT: '#A0C878',
+                    dark: '#143D60',
+                    light: '#DDEB9D',
+                    focus: '#EB5B00'
                 },
                 gaming: {
-                    DEFAULT: '#6B7280', // Gray-500
-                    dark: '#374151',    // Gray-700
-                    light: '#9CA3AF'    // Gray-400
+                    DEFAULT: '#143D60',
+                    dark: '#0A2540',
+                    light: '#A0C878'
                 }
 			},
 			borderRadius: {

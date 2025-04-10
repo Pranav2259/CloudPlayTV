@@ -14,7 +14,7 @@ export const TVLayout: React.FC<TVLayoutProps> = ({ children }) => {
   
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-background">
-      <header className="w-full py-4 px-8 flex items-center justify-between bg-gray-800">
+      <header className="w-full py-4 px-8 flex items-center justify-between bg-gaming">
         <div className="flex items-center space-x-6">
           <nav className="flex">
             <TopNavigation />
@@ -23,7 +23,7 @@ export const TVLayout: React.FC<TVLayoutProps> = ({ children }) => {
         <div className="flex items-center space-x-6">
           <div className="relative">
             <button 
-              className="p-2 rounded-full hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="p-2 rounded-full hover:bg-gaming-dark focus:outline-none focus:ring-2 focus:ring-primary"
               onClick={() => setIsNotificationOpen(!isNotificationOpen)}
             >
               <BellRing className="h-5 w-5" />
@@ -50,4 +50,4 @@ export const TVLayout: React.FC<TVLayoutProps> = ({ children }) => {
       </main>
     </div>
   );
-};
+}
