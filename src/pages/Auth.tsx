@@ -2,30 +2,53 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import { ProfileSelection } from '../components/auth/ProfileSelection';
 import { TVOAuthFlow } from '../components/auth/TVOAuthFlow';
+import { SignUp } from '../components/auth/SignUp';
+import { Login } from '../components/auth/Login';
 
 export default function Auth() {
   const navigate = useNavigate();
-  const [authStep, setAuthStep] = useState<'welcome' | 'oauth' | 'profiles'>('welcome');
+  const [authStep, setAuthStep] = useState<'welcome' | 'oauth' | 'signup' | 'login'>('welcome');
   
   const handleContinue = () => {
     if (authStep === 'welcome') {
-      setAuthStep('oauth');
-    } else {
-      navigate('/');
+      setAuthStep('login');
     }
   };
 
-  const handleAuthSuccess = () => {
-    setAuthStep('profiles');
+  const handleAuthSuccess = (userData: any) => {
+    // In a real app, store user data in context or state management
+    console.log("Authentication successful:", userData);
+    navigate('/');
   };
 
   const handleBack = () => {
-    if (authStep === 'oauth') {
+    if (authStep === 'oauth' || authStep === 'signup' || authStep === 'login') {
       setAuthStep('welcome');
     }
   };
+
+  // Handle anchor hash changes
+  React.useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === '#oauth') {
+        setAuthStep('oauth');
+      } else if (hash === '#signup') {
+        setAuthStep('signup');
+      } else if (hash === '#signin') {
+        setAuthStep('login');
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    // Check hash on initial load
+    handleHashChange();
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
 
   return (
     <div className="h-screen w-screen flex flex-col items-center justify-center bg-gradient-to-br from-background to-card">
@@ -45,7 +68,7 @@ export default function Auth() {
             Welcome to CloudPlay
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-lg mx-auto">
-            Dive into a universe of infinite gameplay, where cutting-edge cloud technology transforms your TV into a portal to extraordinary gaming realms. No wait times. No limits. Just pure gaming magic at your fingertips.
+            Experience gaming without limits. Instant access to hundreds of premium games, no hardware constraints, and seamless play across all your devices. It's not just cloud gaming - it's gaming evolved.
           </p>
           
           <button 
@@ -62,8 +85,12 @@ export default function Auth() {
         <TVOAuthFlow onAuthSuccess={handleAuthSuccess} />
       )}
       
-      {authStep === 'profiles' && (
-        <ProfileSelection onProfileSelect={() => navigate('/')} />
+      {authStep === 'signup' && (
+        <SignUp onSignUpSuccess={handleAuthSuccess} />
+      )}
+      
+      {authStep === 'login' && (
+        <Login onLoginSuccess={handleAuthSuccess} />
       )}
     </div>
   );
