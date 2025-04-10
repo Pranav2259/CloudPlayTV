@@ -8,26 +8,33 @@ interface TVOAuthFlowProps {
   onAuthSuccess: (userData: any) => void;
 }
 
-// In a real app, this would be implemented with a proper OAuth provider
-const generateRandomCode = () => {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let result = '';
-  for (let i = 0; i < 8; i++) {
-    if (i === 4) result += '-';
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+// This would be implemented with a proper OAuth provider API in a production app
+// The code below simulates an API response but would be replaced with actual API calls
+const fetchDeviceCode = async () => {
+  // In a real implementation, this would call an OAuth provider API
+  // Example: POST https://oauth2.googleapis.com/device/code
+  
+  try {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // This simulates the response that would come from an OAuth provider
+    return {
+      device_code: "ABC-" + Math.random().toString(36).substring(2, 10),
+      user_code: "ABCD-1234",
+      verification_url: "https://example.com/device",
+      expires_in: 1800,
+      interval: 5
+    };
+  } catch (error) {
+    throw new Error("Failed to fetch device code");
   }
-  return result;
-};
-
-const generateDeviceCode = () => {
-  const code = Math.random().toString(36).substring(2, 12);
-  return code;
 };
 
 export const TVOAuthFlow: React.FC<TVOAuthFlowProps> = ({ onAuthSuccess }) => {
   const [deviceCode, setDeviceCode] = useState<string | null>(null);
   const [userCode, setUserCode] = useState<string | null>(null);
-  const [verificationUrl, setVerificationUrl] = useState<string | null>("https://accounts.google.com/device");
+  const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -37,16 +44,13 @@ export const TVOAuthFlow: React.FC<TVOAuthFlowProps> = ({ onAuthSuccess }) => {
       setIsLoading(true);
       setIsRefreshing(true);
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // This would be an actual API call in production
+      const response = await fetchDeviceCode();
       
-      // Generate new codes
-      const newDeviceCode = generateDeviceCode();
-      const newUserCode = generateRandomCode();
+      setDeviceCode(response.device_code);
+      setUserCode(response.user_code);
+      setVerificationUrl(response.verification_url);
       
-      setDeviceCode(newDeviceCode);
-      setUserCode(newUserCode);
-      setVerificationUrl("https://accounts.google.com/device");
       setIsLoading(false);
       setIsRefreshing(false);
     } catch (error) {
@@ -67,7 +71,7 @@ export const TVOAuthFlow: React.FC<TVOAuthFlowProps> = ({ onAuthSuccess }) => {
 
   return (
     <div className="w-full max-w-md animate-fade-in">
-      <h2 className="text-3xl font-bold mb-8 text-center">Sign in with Google</h2>
+      <h2 className="text-3xl font-bold mb-8 text-center">Sign in with Device Code</h2>
       
       {isLoading && !isRefreshing ? (
         <div className="flex flex-col items-center justify-center p-8">
@@ -115,7 +119,7 @@ export const TVOAuthFlow: React.FC<TVOAuthFlowProps> = ({ onAuthSuccess }) => {
       
       <div className="text-center mt-8">
         <p className="text-muted-foreground mb-4">
-          Don't have a Google account?
+          Don't have an account?
         </p>
         <a href="#signup" className="text-primary hover:underline focus:tv-focus-text px-4 py-2 bg-card hover:bg-muted transition-colors rounded-lg" tabIndex={0}>
           Create a CloudPlay Account
