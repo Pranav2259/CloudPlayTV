@@ -2,42 +2,53 @@
 import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from "@/hooks/use-toast";
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
 
 interface TVOAuthFlowProps {
   onAuthSuccess: (userData: any) => void;
 }
 
-// Mock data for the device code flow (in a real app, this would come from the OAuth provider API)
-const MOCK_DEVICE_CODE = {
-  device_code: "GmRhmhcxhwAzkoEqiQ5m",
-  user_code: "WDJB-MJHT",
-  verification_url: "https://accounts.google.com/device",
-  expires_in: 1800,
-  interval: 5
+// In a real app, this would be implemented with a proper OAuth provider
+const generateRandomCode = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let result = '';
+  for (let i = 0; i < 8; i++) {
+    if (i === 4) result += '-';
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
+const generateDeviceCode = () => {
+  const code = Math.random().toString(36).substring(2, 12);
+  return code;
 };
 
 export const TVOAuthFlow: React.FC<TVOAuthFlowProps> = ({ onAuthSuccess }) => {
   const [deviceCode, setDeviceCode] = useState<string | null>(null);
   const [userCode, setUserCode] = useState<string | null>(null);
-  const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
-  const [isPolling, setIsPolling] = useState(false);
+  const [verificationUrl, setVerificationUrl] = useState<string | null>("https://accounts.google.com/device");
   const [isLoading, setIsLoading] = useState(true);
-  const [pollCount, setPollCount] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // In a real app, this would call the OAuth provider's API to get a device code
+  // Request a new device code
   const requestDeviceCode = async () => {
     try {
       setIsLoading(true);
+      setIsRefreshing(true);
+      
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Use mock data (in real app, this would be the API response)
-      setDeviceCode(MOCK_DEVICE_CODE.device_code);
-      setUserCode(MOCK_DEVICE_CODE.user_code);
-      setVerificationUrl(MOCK_DEVICE_CODE.verification_url);
+      // Generate new codes
+      const newDeviceCode = generateDeviceCode();
+      const newUserCode = generateRandomCode();
+      
+      setDeviceCode(newDeviceCode);
+      setUserCode(newUserCode);
+      setVerificationUrl("https://accounts.google.com/device");
       setIsLoading(false);
-      setIsPolling(true);
+      setIsRefreshing(false);
     } catch (error) {
       toast({
         title: "Error",
@@ -45,25 +56,7 @@ export const TVOAuthFlow: React.FC<TVOAuthFlowProps> = ({ onAuthSuccess }) => {
         variant: "destructive"
       });
       setIsLoading(false);
-    }
-  };
-
-  // In a real app, this would poll the OAuth provider's token endpoint
-  const pollForToken = async () => {
-    if (!deviceCode || !isPolling) return;
-    
-    // Increment poll count to simulate the process
-    setPollCount(prev => prev + 1);
-    
-    // Simulate success after several polls (in a real app, this would check if the user completed auth)
-    if (pollCount > 4) {
-      setIsPolling(false);
-      // Mock successful authentication
-      onAuthSuccess({ name: "Demo User", email: "demo@example.com" });
-      toast({
-        title: "Success",
-        description: "You've successfully signed in!",
-      });
+      setIsRefreshing(false);
     }
   };
 
@@ -72,24 +65,11 @@ export const TVOAuthFlow: React.FC<TVOAuthFlowProps> = ({ onAuthSuccess }) => {
     requestDeviceCode();
   }, []);
 
-  useEffect(() => {
-    // Poll for token at regular intervals if polling is active
-    let pollInterval: number | null = null;
-    
-    if (isPolling) {
-      pollInterval = window.setInterval(pollForToken, 5000); // Poll every 5 seconds
-    }
-    
-    return () => {
-      if (pollInterval) clearInterval(pollInterval);
-    };
-  }, [isPolling, deviceCode, pollCount]);
-
   return (
     <div className="w-full max-w-md animate-fade-in">
       <h2 className="text-3xl font-bold mb-8 text-center">Sign in with Google</h2>
       
-      {isLoading ? (
+      {isLoading && !isRefreshing ? (
         <div className="flex flex-col items-center justify-center p-8">
           <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
           <p className="text-center">Initializing sign-in process...</p>
@@ -122,19 +102,25 @@ export const TVOAuthFlow: React.FC<TVOAuthFlowProps> = ({ onAuthSuccess }) => {
               </div>
             )}
             
-            {isPolling && (
-              <div className="flex items-center mt-4">
-                <Loader2 className="h-5 w-5 text-primary animate-spin mr-2" />
-                <span>Waiting for authentication...</span>
-              </div>
-            )}
+            <button
+              onClick={requestDeviceCode}
+              className="flex items-center justify-center space-x-2 px-4 py-2 bg-card hover:bg-muted transition-colors rounded-lg"
+            >
+              <RefreshCw className="h-5 w-5 mr-2" />
+              <span>Refresh Code</span>
+            </button>
           </div>
         </div>
       )}
       
-      <p className="text-center mt-8 text-muted-foreground">
-        Don't have a Google account? <a href="#" className="text-primary hover:underline focus:tv-focus-text" tabIndex={0}>Sign in with another method</a>
-      </p>
+      <div className="text-center mt-8">
+        <p className="text-muted-foreground mb-4">
+          Don't have a Google account?
+        </p>
+        <a href="#signup" className="text-primary hover:underline focus:tv-focus-text px-4 py-2 bg-card hover:bg-muted transition-colors rounded-lg" tabIndex={0}>
+          Create a CloudPlay Account
+        </a>
+      </div>
     </div>
   );
 };

@@ -5,22 +5,22 @@
 
 @layer base {
   :root {
-    --background: 213 79% 23%; /* #143D60 dark blue background */
+    --background: 210 30% 15%; /* #1E2A3A - softer dark blue-gray background */
     --foreground: 210 20% 98%; /* Light text color */
 
-    --card: 213 65% 28%; /* Slightly lighter than background for cards */
+    --card: 210 25% 20%; /* #27374D - slightly lighter than background for cards */
     --card-foreground: 210 20% 98%;
 
-    --popover: 213 65% 28%;
+    --popover: 210 25% 20%;
     --popover-foreground: 210 20% 98%;
 
     --primary: 90 52% 63%; /* #A0C878 green */
-    --primary-foreground: 213 79% 23%; /* Dark blue text on light bg */
+    --primary-foreground: 210 30% 15%; /* Dark text on light bg */
 
     --secondary: 74 56% 77%; /* #DDEB9D light green */
-    --secondary-foreground: 213 79% 23%;
+    --secondary-foreground: 210 30% 15%;
 
-    --muted: 213 60% 35%;
+    --muted: 210 20% 25%;
     --muted-foreground: 74 30% 90%;
 
     --accent: 22 100% 46%; /* #EB5B00 orange */
@@ -29,19 +29,19 @@
     --destructive: 0 62% 30%;
     --destructive-foreground: 210 20% 98%;
 
-    --border: 213 34% 40%;
-    --input: 213 34% 40%;
+    --border: 210 20% 30%;
+    --input: 210 20% 30%;
     --ring: 90 52% 63%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 213 79% 18%;
+    --sidebar-background: 210 30% 10%;
     --sidebar-foreground: 210 20% 98%;
     --sidebar-primary: 90 52% 63%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 213 79% 16%;
+    --sidebar-accent: 210 30% 8%;
     --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 213 79% 16%;
+    --sidebar-border: 210 30% 8%;
     --sidebar-ring: 90 52% 63%;
   }
 }
