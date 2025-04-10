@@ -26,7 +26,7 @@ export default function Auth() {
             Welcome to CloudPlay
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-lg mx-auto">
-            Your gateway to cloud gaming on your TV. Play hundreds of games without downloads or installations.
+            Dive into a universe of infinite gameplay, where cutting-edge cloud technology transforms your TV into a portal to extraordinary gaming realms. No wait times. No limits. Just pure gaming magic at your fingertips.
           </p>
           
           <button 

@@ -16,10 +16,7 @@ export const TVLayout: React.FC<TVLayoutProps> = ({ children }) => {
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-background">
       <header className="w-full py-4 px-8 flex items-center justify-between bg-gray-800">
         <div className="flex items-center space-x-6">
-          <h1 className="flex items-center text-3xl font-bold">
-            <span className="bg-white text-black px-1 rounded">GX</span>
-          </h1>
-          <nav className="hidden md:flex">
+          <nav className="flex">
             <TopNavigation />
           </nav>
         </div>
