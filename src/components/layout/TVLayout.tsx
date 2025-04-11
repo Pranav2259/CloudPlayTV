@@ -3,8 +3,7 @@ import React, { useState } from 'react';
 import { TopNavigation } from './TopNavigation';
 import { ControllerBar } from '../controller/ControllerBar';
 import { Credits } from '../credits/Credits';
-import { BellRing, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { BellRing } from 'lucide-react';
 
 interface TVLayoutProps {
   children: React.ReactNode;
@@ -12,16 +11,6 @@ interface TVLayoutProps {
 
 export const TVLayout: React.FC<TVLayoutProps> = ({ children }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const navigate = useNavigate();
-  
-  // In a real app, this would come from auth context
-  const username = "Demo User";
-  
-  const handleLogout = () => {
-    // In a real app, this would clear auth tokens, etc.
-    navigate('/auth');
-  };
   
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-background">
@@ -51,29 +40,6 @@ export const TVLayout: React.FC<TVLayoutProps> = ({ children }) => {
               </div>
             )}
           </div>
-          
-          <div className="relative">
-            <button 
-              className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gaming-dark focus:outline-none focus:ring-2 focus:ring-primary"
-              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            >
-              <User className="h-5 w-5" />
-              <span className="font-medium">{username}</span>
-            </button>
-            {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-card rounded-lg shadow-lg overflow-hidden z-50">
-                <div className="p-1">
-                  <button 
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-muted rounded-md"
-                    onClick={handleLogout}
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-          
           <Credits />
           <ControllerBar />
         </div>
