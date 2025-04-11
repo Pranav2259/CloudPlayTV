@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { TopNavigation } from './TopNavigation';
 import { ControllerBar } from '../controller/ControllerBar';
 import { Credits } from '../credits/Credits';
-import { BellRing } from 'lucide-react';
+import { BellRing, ChevronDown } from 'lucide-react';
 
 interface TVLayoutProps {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ export const TVLayout: React.FC<TVLayoutProps> = ({ children }) => {
   
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-background">
-      <header className="w-full py-4 px-8 flex items-center justify-between bg-gaming shadow-md">
+      <header className="w-full py-4 px-8 flex items-center justify-between bg-gaming">
         <div className="flex items-center space-x-6">
           <nav className="flex">
             <TopNavigation />
