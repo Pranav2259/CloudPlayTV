@@ -2,10 +2,13 @@
 import React, { useState } from 'react';
 import { TVLayout } from '../components/layout/TVLayout';
 import { User, CreditCard, Gamepad2, Monitor, Shield, HelpCircle, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from '../hooks/use-toast';
 
 export default function Settings() {
   const [selectedTab, setSelectedTab] = useState('profile');
   const [focusedSettingIndex, setFocusedSettingIndex] = useState(0);
+  const navigate = useNavigate();
   
   // Settings categories (removed family and notifications)
   const settingsCategories = [
@@ -32,6 +35,21 @@ export default function Settings() {
         prevItem?.focus();
       }
     }
+  };
+  
+  const handleSignOut = () => {
+    // Clear any user authentication from localStorage
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
+    
+    // Show a toast notification
+    toast({
+      title: "Signed out successfully",
+      description: "You have been signed out of your account",
+    });
+    
+    // Redirect to auth page
+    navigate('/auth');
   };
   
   // Mock user data
@@ -78,6 +96,7 @@ export default function Settings() {
               <button
                 className="w-full flex items-center py-3 px-4 rounded-lg text-red-500 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-gray-500"
                 tabIndex={0}
+                onClick={handleSignOut}
               >
                 <LogOut className="h-5 w-5 mr-3" />
                 <span>Sign Out</span>

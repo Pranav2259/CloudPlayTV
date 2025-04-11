@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { TopNavigation } from './TopNavigation';
 import { ControllerBar } from '../controller/ControllerBar';
 import { Credits } from '../credits/Credits';
-import { BellRing, ChevronDown } from 'lucide-react';
+import { BellRing } from 'lucide-react';
 
 interface TVLayoutProps {
   children: React.ReactNode;
