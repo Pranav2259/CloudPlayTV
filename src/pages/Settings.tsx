@@ -1,34 +1,43 @@
-
-import React, { useState } from 'react';
-import { TVLayout } from '../components/layout/TVLayout';
-import { User, CreditCard, Gamepad2, Monitor, Shield, HelpCircle, LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from '../hooks/use-toast';
+import React, { useState } from "react";
+import { TVLayout } from "../components/layout/TVLayout";
+import {
+  User,
+  CreditCard,
+  Gamepad2,
+  Monitor,
+  Shield,
+  HelpCircle,
+  LogOut,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Settings() {
-  const [selectedTab, setSelectedTab] = useState('profile');
+  const [selectedTab, setSelectedTab] = useState("profile");
   const [focusedSettingIndex, setFocusedSettingIndex] = useState(0);
   const navigate = useNavigate();
-  
+  const { signOut } = useAuth();
+
   // Settings categories (removed family and notifications)
   const settingsCategories = [
-    { id: 'profile', name: 'User Profile', icon: User },
-    { id: 'credit', name: 'Credit & Billing', icon: CreditCard },
-    { id: 'controllers', name: 'Controllers', icon: Gamepad2 },
-    { id: 'display', name: 'Display & Sound', icon: Monitor },
-    { id: 'privacy', name: 'Privacy & Security', icon: Shield },
-    { id: 'help', name: 'Help & Support', icon: HelpCircle },
+    { id: "profile", name: "User Profile", icon: User },
+    { id: "credit", name: "Credit & Billing", icon: CreditCard },
+    { id: "controllers", name: "Controllers", icon: Gamepad2 },
+    { id: "display", name: "Display & Sound", icon: Monitor },
+    { id: "privacy", name: "Privacy & Security", icon: Shield },
+    { id: "help", name: "Help & Support", icon: HelpCircle },
   ];
-  
+
   const handleKeyNavigation = (e: React.KeyboardEvent, index: number) => {
     // Handle TV remote navigation for settings sidebar
-    if (e.key === 'ArrowDown') {
+    if (e.key === "ArrowDown") {
       if (index < settingsCategories.length - 1) {
         setFocusedSettingIndex(index + 1);
         const nextItem = document.getElementById(`setting-${index + 1}`);
         nextItem?.focus();
       }
-    } else if (e.key === 'ArrowUp') {
+    } else if (e.key === "ArrowUp") {
       if (index > 0) {
         setFocusedSettingIndex(index - 1);
         const prevItem = document.getElementById(`setting-${index - 1}`);
@@ -36,31 +45,28 @@ export default function Settings() {
       }
     }
   };
-  
-  const handleSignOut = () => {
-    // Clear any user authentication from localStorage
-    localStorage.removeItem('user');
-    localStorage.removeItem('isAuthenticated');
-    
-    // Show a toast notification
-    toast({
-      title: "Signed out successfully",
-      description: "You have been signed out of your account",
-    });
-    
-    // Redirect to auth page
-    navigate('/auth');
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await signOut();
+      if (error) throw error;
+
+      toast.success("Signed out successfully");
+      navigate("/auth", { replace: true });
+    } catch (error) {
+      toast.error("Failed to sign out");
+    }
   };
-  
+
   // Mock user data
   const userData = {
-    name: 'Player 1',
-    email: 'player1@example.com',
-    avatar: '👨‍🚀',
-    memberSince: 'June 2023',
-    language: 'English',
-    timezone: 'Pacific Time (GMT-8)',
-    parental: 'None',
+    name: "Player 1",
+    email: "player1@example.com",
+    avatar: "👨‍🚀",
+    memberSince: "June 2023",
+    language: "English",
+    timezone: "Pacific Time (GMT-8)",
+    parental: "None",
   };
 
   return (
@@ -70,7 +76,7 @@ export default function Settings() {
         <div className="w-64 bg-card border-r border-muted">
           <div className="p-6">
             <h2 className="text-xl font-bold mb-6">Settings</h2>
-            
+
             <nav className="space-y-1">
               {settingsCategories.map((category, index) => (
                 <button
@@ -78,9 +84,13 @@ export default function Settings() {
                   id={`setting-${index}`}
                   className={`w-full flex items-center py-3 px-4 rounded-lg transition-colors ${
                     selectedTab === category.id
-                      ? 'bg-gray-700 text-white'
-                      : 'hover:bg-muted'
-                  } ${focusedSettingIndex === index ? 'outline-none ring-2 ring-gray-500' : ''}`}
+                      ? "bg-gray-700 text-white"
+                      : "hover:bg-muted"
+                  } ${
+                    focusedSettingIndex === index
+                      ? "outline-none ring-2 ring-gray-500"
+                      : ""
+                  }`}
                   onClick={() => setSelectedTab(category.id)}
                   onFocus={() => setFocusedSettingIndex(index)}
                   onKeyDown={(e) => handleKeyNavigation(e, index)}
@@ -91,7 +101,7 @@ export default function Settings() {
                 </button>
               ))}
             </nav>
-            
+
             <div className="mt-auto pt-6 border-t border-muted mt-8">
               <button
                 className="w-full flex items-center py-3 px-4 rounded-lg text-red-500 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-gray-500"
@@ -104,13 +114,13 @@ export default function Settings() {
             </div>
           </div>
         </div>
-        
+
         {/* Settings content */}
         <div className="flex-1 overflow-y-auto p-8 tv-scrollbar">
-          {selectedTab === 'profile' && (
+          {selectedTab === "profile" && (
             <div className="animate-fade-in">
               <h2 className="text-2xl font-bold mb-6">User Profile</h2>
-              
+
               <div className="flex items-center mb-8">
                 <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center text-4xl mr-6">
                   {userData.avatar}
@@ -118,20 +128,26 @@ export default function Settings() {
                 <div>
                   <h3 className="text-xl font-bold">{userData.name}</h3>
                   <p className="text-muted-foreground">{userData.email}</p>
-                  <p className="text-sm text-muted-foreground">Member since {userData.memberSince}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Member since {userData.memberSince}
+                  </p>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium mb-3">Profile Information</h3>
+                    <h3 className="text-lg font-medium mb-3">
+                      Profile Information
+                    </h3>
                     <div className="bg-card rounded-lg divide-y divide-muted">
                       <div className="p-4 flex justify-between items-center">
-                        <span className="text-muted-foreground">Display Name</span>
+                        <span className="text-muted-foreground">
+                          Display Name
+                        </span>
                         <div className="flex items-center">
                           <span>{userData.name}</span>
-                          <button 
+                          <button
                             className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                             tabIndex={0}
                           >
@@ -147,7 +163,7 @@ export default function Settings() {
                         <span className="text-muted-foreground">Avatar</span>
                         <div className="flex items-center">
                           <span>{userData.avatar}</span>
-                          <button 
+                          <button
                             className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                             tabIndex={0}
                           >
@@ -157,13 +173,13 @@ export default function Settings() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-lg font-medium mb-3">Security</h3>
                     <div className="bg-card rounded-lg divide-y divide-muted">
                       <div className="p-4 flex justify-between items-center">
                         <span className="text-muted-foreground">Password</span>
-                        <button 
+                        <button
                           className="text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                           tabIndex={0}
                         >
@@ -171,8 +187,10 @@ export default function Settings() {
                         </button>
                       </div>
                       <div className="p-4 flex justify-between items-center">
-                        <span className="text-muted-foreground">Two-Factor Authentication</span>
-                        <button 
+                        <span className="text-muted-foreground">
+                          Two-Factor Authentication
+                        </span>
+                        <button
                           className="text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                           tabIndex={0}
                         >
@@ -182,7 +200,7 @@ export default function Settings() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-lg font-medium mb-3">Preferences</h3>
@@ -191,7 +209,7 @@ export default function Settings() {
                         <span className="text-muted-foreground">Language</span>
                         <div className="flex items-center">
                           <span>{userData.language}</span>
-                          <button 
+                          <button
                             className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                             tabIndex={0}
                           >
@@ -203,7 +221,7 @@ export default function Settings() {
                         <span className="text-muted-foreground">Time Zone</span>
                         <div className="flex items-center">
                           <span>{userData.timezone}</span>
-                          <button 
+                          <button
                             className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                             tabIndex={0}
                           >
@@ -212,10 +230,12 @@ export default function Settings() {
                         </div>
                       </div>
                       <div className="p-4 flex justify-between items-center">
-                        <span className="text-muted-foreground">Parental Controls</span>
+                        <span className="text-muted-foreground">
+                          Parental Controls
+                        </span>
                         <div className="flex items-center">
                           <span>{userData.parental}</span>
-                          <button 
+                          <button
                             className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
                             tabIndex={0}
                           >
@@ -225,20 +245,22 @@ export default function Settings() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
-                    <h3 className="text-lg font-medium mb-3">Connected Accounts</h3>
-                    <button 
+                    <h3 className="text-lg font-medium mb-3">
+                      Connected Accounts
+                    </h3>
+                    <button
                       className="w-full py-3 bg-muted rounded-lg text-center hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-gray-500"
                       tabIndex={0}
                     >
                       Connect Social Accounts
                     </button>
                   </div>
-                  
+
                   <div>
                     <h3 className="text-lg font-medium mb-3">Delete Account</h3>
-                    <button 
+                    <button
                       className="w-full py-3 bg-red-500/10 text-red-500 rounded-lg text-center hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-500"
                       tabIndex={0}
                     >
@@ -249,16 +271,19 @@ export default function Settings() {
               </div>
             </div>
           )}
-          
-          {selectedTab !== 'profile' && (
+
+          {selectedTab !== "profile" && (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <h2 className="text-2xl font-bold mb-4 capitalize">{
-                settingsCategories.find(cat => cat.id === selectedTab)?.name
-              } Settings</h2>
-              <p className="text-muted-foreground mb-8">This settings section is not implemented in the demo.</p>
-              <button 
+              <h2 className="text-2xl font-bold mb-4 capitalize">
+                {settingsCategories.find((cat) => cat.id === selectedTab)?.name}{" "}
+                Settings
+              </h2>
+              <p className="text-muted-foreground mb-8">
+                This settings section is not implemented in the demo.
+              </p>
+              <button
                 className="tv-btn bg-gray-700 text-white"
-                onClick={() => setSelectedTab('profile')}
+                onClick={() => setSelectedTab("profile")}
                 tabIndex={0}
               >
                 Return to Profile Settings
