@@ -41,14 +41,6 @@ const loginSchema = z.object({
 
 const signupSchema = z
   .object({
-    username: z
-      .string()
-      .min(1, { message: "Username is required" })
-      .min(3, { message: "Username must be at least 3 characters" })
-      .regex(/^[a-zA-Z0-9_-]+$/, {
-        message:
-          "Username can only contain letters, numbers, underscores, and hyphens",
-      }),
     email: z
       .string()
       .min(1, { message: "Email is required" })
@@ -96,6 +88,13 @@ const FormMessage = ({ children }: { children: React.ReactNode }) => (
   <div className="text-[#EB5B00] text-sm font-medium">{children}</div>
 );
 
+// Function to generate a random username
+const generateRandomUsername = () => {
+  const prefix = "user";
+  const randomNum = Math.floor(Math.random() * 100000);
+  return `${prefix}${randomNum}`;
+};
+
 export default function Auth() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -126,7 +125,6 @@ export default function Auth() {
   const signupForm = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -218,13 +216,16 @@ export default function Auth() {
         throw new Error("Email already registered");
       }
 
+      // Generate a random username
+      const randomUsername = generateRandomUsername();
+
       // Try to sign up directly - Supabase will handle duplicate emails
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {
           data: {
-            username: values.username,
+            username: randomUsername,
           },
         },
       });
@@ -248,19 +249,40 @@ export default function Auth() {
         const { error: insertError } = await supabase.from("profiles").insert([
           {
             id: data.user.id,
-            username: values.username,
+            username: randomUsername,
             email: values.email,
           },
         ]);
 
         if (insertError) {
-          // If profile creation fails, we should log out the user
-          await supabase.auth.signOut();
-          throw new Error("Failed to create profile");
+          // If profile creation fails, try with a different random username
+          if (insertError.message.includes("unique constraint")) {
+            // Try one more time with a different username
+            const newRandomUsername = generateRandomUsername();
+            const { error: retryError } = await supabase
+              .from("profiles")
+              .insert([
+                {
+                  id: data.user.id,
+                  username: newRandomUsername,
+                  email: values.email,
+                },
+              ]);
+
+            if (retryError) {
+              // If it still fails, log out the user and show error
+              await supabase.auth.signOut();
+              throw new Error("Failed to create profile");
+            }
+          } else {
+            // For other errors, log out and show error
+            await supabase.auth.signOut();
+            throw new Error("Failed to create profile");
+          }
         }
 
         toast.success(
-          "Please check your email for a confirmation link to complete your registration"
+          "Account created successfully! Please check your email to verify your account. You can change your username in settings after logging in."
         );
         setAuthMode("login");
         return;
@@ -451,7 +473,8 @@ export default function Auth() {
                 Create Account
               </CardTitle>
               <CardDescription className="text-base">
-                Enter your details to create a new account
+                Enter your details to create a new account. You can customize
+                your username later in settings.
               </CardDescription>
             </CardHeader>
             <CardContent
@@ -463,59 +486,35 @@ export default function Auth() {
                   onSubmit={signupForm.handleSubmit(onSignupSubmit)}
                   className="space-y-4"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={signupForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Username</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="johndoe"
-                              {...field}
-                              className="focus:tv-focus-input"
-                              tabIndex={0}
-                              disabled={loading}
-                            />
-                          </FormControl>
-                          <FormErrorMessage>
-                            {signupForm.formState.errors[field.name]?.message}
-                          </FormErrorMessage>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={signupForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="email@example.com"
-                              {...field}
-                              className={`focus:tv-focus-input ${
-                                emailExists ? "border-[#EB5B00]" : ""
-                              }`}
-                              tabIndex={0}
-                              disabled={loading}
-                              onChange={(e) => {
-                                field.onChange(e);
-                                checkEmailExists(e.target.value);
-                              }}
-                            />
-                          </FormControl>
-                          <FormErrorMessage>
-                            {emailExists
-                              ? "Email already registered"
-                              : signupForm.formState.errors[field.name]
-                                  ?.message}
-                          </FormErrorMessage>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={signupForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="email@example.com"
+                            {...field}
+                            className={`focus:tv-focus-input ${
+                              emailExists ? "border-[#EB5B00]" : ""
+                            }`}
+                            tabIndex={0}
+                            disabled={loading}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              checkEmailExists(e.target.value);
+                            }}
+                          />
+                        </FormControl>
+                        <FormErrorMessage>
+                          {emailExists
+                            ? "Email already registered"
+                            : signupForm.formState.errors[field.name]?.message}
+                        </FormErrorMessage>
+                      </FormItem>
+                    )}
+                  />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={signupForm.control}
