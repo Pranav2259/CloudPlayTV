@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { TVLayout } from "../components/layout/TVLayout";
 import {
   User,
@@ -23,7 +23,22 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { v4 as uuidv4 } from "uuid";
 
 interface ProfileFormValues {
   username: string;
@@ -32,13 +47,34 @@ interface ProfileFormValues {
 }
 
 export default function Settings() {
+  const navigate = useNavigate();
+  const { signOut, user, refreshUser } = useAuth();
+
   const [selectedTab, setSelectedTab] = useState("profile");
   const [focusedSettingIndex, setFocusedSettingIndex] = useState(0);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { signOut, user, refreshUser } = useAuth();
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [selectedEmoji, setSelectedEmoji] = useState(
+    user?.user_metadata?.avatar_emoji || "👨‍🚀"
+  );
+
+  // Settings categories
+  const settingsCategories = [
+    { id: "profile", name: "User Profile", icon: User },
+    { id: "credit", name: "Credit & Billing", icon: CreditCard },
+    { id: "controllers", name: "Controllers", icon: Gamepad2 },
+    { id: "display", name: "Display & Sound", icon: Monitor },
+    { id: "privacy", name: "Privacy & Security", icon: Shield },
+    { id: "help", name: "Help & Support", icon: HelpCircle },
+  ];
 
   // Display settings state
   const [displaySettings, setDisplaySettings] = useState({
@@ -58,21 +94,33 @@ export default function Settings() {
     deadzone: 10,
   });
 
-  // Settings categories (removed family and notifications)
-  const settingsCategories = [
-    { id: "profile", name: "User Profile", icon: User },
-    { id: "credit", name: "Credit & Billing", icon: CreditCard },
-    { id: "controllers", name: "Controllers", icon: Gamepad2 },
-    { id: "display", name: "Display & Sound", icon: Monitor },
-    { id: "privacy", name: "Privacy & Security", icon: Shield },
-    { id: "help", name: "Help & Support", icon: HelpCircle },
+  // List of available avatar emojis
+  const avatarEmojis = [
+    "👨‍🚀",
+    "👩‍🚀",
+    "🦸‍♂️",
+    "🦸‍♀️",
+    "🧙‍♂️",
+    "🧙‍♀️",
+    "👾",
+    "🤖",
+    "👻",
+    "🎮",
+    "🕹️",
+    "🎲",
+    "🦊",
+    "🐱",
+    "🐶",
+    "🐼",
+    "🐨",
+    "🦁",
   ];
 
-  // Mock user data - now using actual user data from auth context
+  // Update userData to use emoji
   const userData = {
     name: user?.user_metadata?.username || "Player 1",
     email: user?.email || "player1@example.com",
-    avatar: user?.user_metadata?.avatar_url || "👨‍🚀",
+    avatar_emoji: user?.user_metadata?.avatar_emoji || "👨‍🚀",
     memberSince: new Date(user?.created_at || Date.now()).toLocaleDateString(
       "en-US",
       { month: "long", year: "numeric" }
@@ -184,6 +232,140 @@ export default function Settings() {
     }
   };
 
+  const handlePasswordUpdate = async () => {
+    if (!oldPassword) {
+      toast({
+        description: "Please enter your current password",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast({
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast({
+        description: "Password must be at least 6 characters long",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // First verify the old password by attempting to sign in
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user?.email || "",
+        password: oldPassword,
+      });
+
+      if (signInError) {
+        throw new Error("Current password is incorrect");
+      }
+
+      // If old password is correct, proceed with password update
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) throw error;
+
+      toast({
+        description: "Password updated successfully",
+      });
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setIsPasswordDialogOpen(false);
+    } catch (error) {
+      toast({
+        description:
+          error instanceof Error ? error.message : "Failed to update password",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmation !== "delete") {
+      toast({
+        description: "Please type 'delete' to confirm account deletion",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Call the delete_user SQL function
+      const { error } = await supabase.rpc("delete_user");
+
+      if (error) {
+        throw error;
+      }
+
+      // Sign out after successful deletion
+      await supabase.auth.signOut();
+      navigate("/");
+      toast({
+        description: "Your account has been successfully deleted",
+      });
+    } catch (error) {
+      toast({
+        description:
+          error instanceof Error ? error.message : "Failed to delete account",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+      setDeleteConfirmation("");
+    }
+  };
+
+  const handleAvatarChange = async (emoji: string) => {
+    if (!user) return;
+
+    setIsLoading(true);
+    try {
+      // Update profile
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ avatar_emoji: emoji })
+        .eq("id", user.id);
+
+      if (updateError) throw updateError;
+
+      // Update user metadata
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: { avatar_emoji: emoji },
+      });
+
+      if (metadataError) throw metadataError;
+
+      setSelectedEmoji(emoji);
+      await refreshUser();
+      toast({
+        description: "Avatar updated successfully",
+      });
+      setIsAvatarDialogOpen(false);
+    } catch (error) {
+      toast({
+        description:
+          error instanceof Error ? error.message : "Failed to update avatar",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <TVLayout>
       <div className="h-full flex">
@@ -238,7 +420,7 @@ export default function Settings() {
 
               <div className="flex items-center mb-8">
                 <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center text-4xl mr-6">
-                  {userData.avatar}
+                  {selectedEmoji}
                 </div>
                 <div>
                   <h3 className="text-xl font-bold">{userData.name}</h3>
@@ -279,13 +461,45 @@ export default function Settings() {
                       <div className="p-4 flex justify-between items-center">
                         <span className="text-muted-foreground">Avatar</span>
                         <div className="flex items-center">
-                          <span>{userData.avatar}</span>
-                          <button
-                            className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
-                            tabIndex={0}
+                          <span className="text-2xl mr-3">{selectedEmoji}</span>
+                          <Dialog
+                            open={isAvatarDialogOpen}
+                            onOpenChange={setIsAvatarDialogOpen}
                           >
-                            Change
-                          </button>
+                            <DialogTrigger asChild>
+                              <button
+                                className="text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
+                                tabIndex={0}
+                              >
+                                Change
+                              </button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px] bg-card text-foreground">
+                              <DialogHeader>
+                                <DialogTitle>Choose Avatar</DialogTitle>
+                                <DialogDescription>
+                                  Select an emoji to represent you in the game
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="grid grid-cols-6 gap-4 p-4">
+                                {avatarEmojis.map((emoji) => (
+                                  <button
+                                    key={emoji}
+                                    onClick={() => handleAvatarChange(emoji)}
+                                    className={`text-2xl p-2 rounded-lg hover:bg-muted transition-colors ${
+                                      selectedEmoji === emoji
+                                        ? "bg-muted ring-2 ring-primary"
+                                        : ""
+                                    }`}
+                                    disabled={isLoading}
+                                    title={`Select ${emoji} as avatar`}
+                                  >
+                                    {emoji}
+                                  </button>
+                                ))}
+                              </div>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </div>
                     </div>
@@ -296,23 +510,107 @@ export default function Settings() {
                     <div className="bg-card rounded-lg divide-y divide-muted">
                       <div className="p-4 flex justify-between items-center">
                         <span className="text-muted-foreground">Password</span>
-                        <button
-                          className="text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
-                          tabIndex={0}
+                        <Dialog
+                          open={isPasswordDialogOpen}
+                          onOpenChange={setIsPasswordDialogOpen}
                         >
-                          Change Password
-                        </button>
-                      </div>
-                      <div className="p-4 flex justify-between items-center">
-                        <span className="text-muted-foreground">
-                          Two-Factor Authentication
-                        </span>
-                        <button
-                          className="text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
-                          tabIndex={0}
-                        >
-                          Enable
-                        </button>
+                          <DialogTrigger asChild>
+                            <button
+                              className="text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
+                              tabIndex={0}
+                            >
+                              Change Password
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-[425px] bg-card text-foreground">
+                            <DialogHeader>
+                              <DialogTitle>Change Password</DialogTitle>
+                              <DialogDescription>
+                                Enter your current password and a new password
+                                for your account.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <label
+                                  htmlFor="oldPassword"
+                                  className="text-right text-sm"
+                                >
+                                  Current Password
+                                </label>
+                                <Input
+                                  id="oldPassword"
+                                  type="password"
+                                  value={oldPassword}
+                                  onChange={(e) =>
+                                    setOldPassword(e.target.value)
+                                  }
+                                  className="col-span-3 bg-input text-foreground border-border"
+                                  placeholder="Enter current password"
+                                />
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <label
+                                  htmlFor="newPassword"
+                                  className="text-right text-sm"
+                                >
+                                  New Password
+                                </label>
+                                <Input
+                                  id="newPassword"
+                                  type="password"
+                                  value={newPassword}
+                                  onChange={(e) =>
+                                    setNewPassword(e.target.value)
+                                  }
+                                  className="col-span-3 bg-input text-foreground border-border"
+                                  placeholder="Enter new password"
+                                />
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <label
+                                  htmlFor="confirmPassword"
+                                  className="text-right text-sm"
+                                >
+                                  Confirm Password
+                                </label>
+                                <Input
+                                  id="confirmPassword"
+                                  type="password"
+                                  value={confirmPassword}
+                                  onChange={(e) =>
+                                    setConfirmPassword(e.target.value)
+                                  }
+                                  className="col-span-3 bg-input text-foreground border-border"
+                                  placeholder="Confirm new password"
+                                />
+                              </div>
+                            </div>
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                <Button
+                                  type="button"
+                                  variant="secondary"
+                                  disabled={isLoading}
+                                >
+                                  Cancel
+                                </Button>
+                              </DialogClose>
+                              <Button
+                                type="submit"
+                                onClick={handlePasswordUpdate}
+                                disabled={
+                                  isLoading ||
+                                  !oldPassword ||
+                                  !newPassword ||
+                                  newPassword !== confirmPassword
+                                }
+                              >
+                                {isLoading ? "Updating..." : "Update Password"}
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </div>
                   </div>
@@ -324,51 +622,76 @@ export default function Settings() {
                     <div className="bg-card rounded-lg divide-y divide-muted">
                       <div className="p-4 flex justify-between items-center">
                         <span className="text-muted-foreground">Language</span>
-                        <div className="flex items-center">
-                          <span>{userData.language}</span>
-                          <button
-                            className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
-                            tabIndex={0}
-                          >
-                            Change
-                          </button>
-                        </div>
+                        <span>English</span>
                       </div>
                       <div className="p-4 flex justify-between items-center">
                         <span className="text-muted-foreground">Time Zone</span>
-                        <div className="flex items-center">
-                          <span>{userData.timezone}</span>
-                          <button
-                            className="ml-3 text-gray-400 hover:underline focus:outline-none focus:text-gray-300"
-                            tabIndex={0}
-                          >
-                            Change
-                          </button>
-                        </div>
+                        <span>
+                          {userData.timezone} (Auto-detected based on your
+                          location)
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-medium mb-3">
-                      Connected Accounts
-                    </h3>
-                    <button
-                      className="w-full py-3 bg-muted rounded-lg text-center hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                      tabIndex={0}
-                    >
-                      Connect Social Accounts
-                    </button>
-                  </div>
-
-                  <div>
                     <h3 className="text-lg font-medium mb-3">Delete Account</h3>
-                    <button
-                      className="w-full py-3 bg-red-500/10 text-red-500 rounded-lg text-center hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-500"
-                      tabIndex={0}
-                    >
-                      Delete My Account
-                    </button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button
+                          className="w-full py-3 bg-red-500/10 text-red-500 rounded-lg text-center hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-500"
+                          tabIndex={0}
+                          disabled={isLoading}
+                        >
+                          Delete My Account
+                        </button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-card text-foreground">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="space-y-4">
+                            <p>
+                              This action cannot be undone. This will
+                              permanently delete your account and remove your
+                              data from our servers.
+                            </p>
+                            <div className="space-y-2">
+                              <label
+                                htmlFor="deleteConfirmation"
+                                className="text-sm font-medium"
+                              >
+                                Type "delete" to confirm:
+                              </label>
+                              <Input
+                                id="deleteConfirmation"
+                                value={deleteConfirmation}
+                                onChange={(e) =>
+                                  setDeleteConfirmation(e.target.value)
+                                }
+                                placeholder="Type 'delete' to confirm"
+                                className="w-full"
+                              />
+                            </div>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel disabled={isLoading}>
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleDeleteAccount}
+                            disabled={
+                              isLoading || deleteConfirmation !== "delete"
+                            }
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                          >
+                            {isLoading ? "Deleting..." : "Yes, delete account"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </div>
@@ -433,14 +756,6 @@ export default function Settings() {
                     Security Settings
                   </h3>
                   <div className="bg-card rounded-lg divide-y divide-muted">
-                    <div className="p-4 flex justify-between items-center">
-                      <span className="text-muted-foreground">
-                        Two-Factor Authentication
-                      </span>
-                      <button className="text-blue-500 hover:underline">
-                        Enable
-                      </button>
-                    </div>
                     <div className="p-4 flex justify-between items-center">
                       <span className="text-muted-foreground">
                         Login History
