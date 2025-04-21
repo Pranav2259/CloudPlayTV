@@ -687,7 +687,6 @@ export default function Auth() {
     </div>
   );
 }
-
 // Profile Button Component
 const ProfileButton = ({
   name,
