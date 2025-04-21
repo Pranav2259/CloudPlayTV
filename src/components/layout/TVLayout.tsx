@@ -1,9 +1,8 @@
-
-import React, { useState } from 'react';
-import { TopNavigation } from './TopNavigation';
-import { ControllerBar } from '../controller/ControllerBar';
-import { Credits } from '../credits/Credits';
-import { BellRing } from 'lucide-react';
+import React, { useState } from "react";
+import { TopNavigation } from "./TopNavigation";
+import { ControllerBar } from "../controller/ControllerBar";
+import { Credits } from "../credits/Credits";
+import { BellRing } from "lucide-react";
 
 interface TVLayoutProps {
   children: React.ReactNode;
@@ -11,18 +10,32 @@ interface TVLayoutProps {
 
 export const TVLayout: React.FC<TVLayoutProps> = ({ children }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  
+
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-background">
       <header className="w-full py-4 px-8 flex items-center justify-between bg-gaming">
         <div className="flex items-center space-x-6">
-          <nav className="flex">
-            <TopNavigation />
-          </nav>
+          <div className="flex items-center">
+            <div className="flex items-center justify-center h-10 w-auto mr-6 rounded-full bg-transparent">
+              <span
+                className="text-2xl font-bold"
+                style={{
+                  background: "linear-gradient(to right, #1EAEDB, #A0C878)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                CloudPlay
+              </span>
+            </div>
+            <nav className="flex">
+              <TopNavigation />
+            </nav>
+          </div>
         </div>
         <div className="flex items-center space-x-6">
           <div className="relative">
-            <button 
+            <button
               className="p-2 rounded-full hover:bg-gaming-dark focus:outline-none focus:ring-2 focus:ring-primary"
               onClick={() => setIsNotificationOpen(!isNotificationOpen)}
             >
@@ -35,7 +48,9 @@ export const TVLayout: React.FC<TVLayoutProps> = ({ children }) => {
                   <h3 className="font-medium">Notifications</h3>
                 </div>
                 <div className="p-2">
-                  <p className="text-sm text-muted-foreground p-4 text-center">No new notifications</p>
+                  <p className="text-sm text-muted-foreground p-4 text-center">
+                    No new notifications
+                  </p>
                 </div>
               </div>
             )}
@@ -44,10 +59,8 @@ export const TVLayout: React.FC<TVLayoutProps> = ({ children }) => {
           <ControllerBar />
         </div>
       </header>
-      
-      <main className="flex-1 overflow-hidden">
-        {children}
-      </main>
+
+      <main className="flex-1 overflow-hidden">{children}</main>
     </div>
   );
-}
+};
