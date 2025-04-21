@@ -1,73 +1,137 @@
-# Welcome to your Lovable project
+# CloudPlayTV
 
-## Project info
+A modern game library management platform built with cutting-edge technologies and AI-powered features.
 
-**URL**: https://lovable.dev/projects/ee31cd03-4c4b-4655-be9b-22cf4ab580d0
+## 🚀 Features
 
-## How can I edit this code?
+- **Secure Authentication**
 
-There are several ways of editing your application.
+  - Email-based signup/login with verification
+  - Profile management
+  - Password reset functionality
 
-**Use Lovable**
+- **Game Library Management** (Coming Soon)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ee31cd03-4c4b-4655-be9b-22cf4ab580d0) and start prompting.
+  - Import games from various platforms
+  - Track gameplay statistics
+  - Organize and categorize games
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Social Features** (Coming Soon)
+  - Friend system
+  - Activity feed
+  - Game recommendations
 
-**Use your preferred IDE**
+## 🛠️ Tech Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Frontend**
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+  - React + TypeScript
+  - Tailwind CSS
+  - Shadcn/ui Components
+  - React Query for data fetching
+  - Zod for form validation
 
-Follow these steps:
+- **Backend**
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+  - Supabase (Backend as a Service)
+  - PostgreSQL Database
+  - Row Level Security (RLS)
+  - Real-time subscriptions
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **AI Integration**
+  - Built with AI assistance (Claude, Cursor)
+  - AI-powered game recommendations (Coming Soon)
+  - Intelligent search capabilities (Coming Soon)
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🔧 Development
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/CloudPlayTV.git
+cd CloudPlayTV
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Set up environment variables:
+
+```bash
+cp .env.example .env
+# Add your Supabase credentials
+```
+
+4. Start the development server:
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 📦 Deployment
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The project is deployed using [Platform TBD]. You can view the live version at [URL TBD].
 
-**Use GitHub Codespaces**
+### Deployment Options:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. **Vercel**
 
-## What technologies are used for this project?
+   - Perfect for React applications
+   - Automatic deployments from Git
+   - Free tier available
 
-This project is built with:
+2. **Supabase Hosting**
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+   - Integrated with our backend
+   - Easy database management
+   - Free tier available
 
-## How can I deploy this project?
+3. **GitHub Pages**
+   - Free hosting
+   - Simple deployment process
+   - Good for static sites
 
-Simply open [Lovable](https://lovable.dev/projects/ee31cd03-4c4b-4655-be9b-22cf4ab580d0) and click on Share -> Publish.
+## 🎯 Next Steps
 
-## Can I connect a custom domain to my Lovable project?
+1. **Game Integration**
 
-Yes it is!
+   - Steam API integration
+   - Epic Games integration
+   - Game metadata fetching
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+2. **Social Features**
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+   - Friend system implementation
+   - Activity feed
+   - Real-time notifications
+
+3. **AI Features**
+   - Game recommendations
+   - Smart search
+   - Content personalization
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🛡️ Built with AI Assistance
+
+This project showcases modern AI-powered development practices:
+
+- **Prompt Engineering**: Utilized advanced prompting techniques with Claude AI
+- **AI Pair Programming**: Developed with Cursor AI assistance
+- **GenAI Integration**: Leveraging AI for code generation and problem-solving
+- **Modern Development**: Combining human expertise with AI capabilities
+
+## 🔗 Links
+
+- [Live Demo](URL_TBD)
+- [Documentation](URL_TBD)
+- [Issue Tracker](URL_TBD)

@@ -21,7 +21,15 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { User, UserPlus, ChevronLeft, Eye, EyeOff } from "lucide-react";
+import {
+  User,
+  UserPlus,
+  ChevronLeft,
+  Eye,
+  EyeOff,
+  Mail,
+  Loader2,
+} from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -41,14 +49,6 @@ const loginSchema = z.object({
 
 const signupSchema = z
   .object({
-    username: z
-      .string()
-      .min(1, { message: "Username is required" })
-      .min(3, { message: "Username must be at least 3 characters" })
-      .regex(/^[a-zA-Z0-9_-]+$/, {
-        message:
-          "Username can only contain letters, numbers, underscores, and hyphens",
-      }),
     email: z
       .string()
       .min(1, { message: "Email is required" })
@@ -96,18 +96,26 @@ const FormMessage = ({ children }: { children: React.ReactNode }) => (
   <div className="text-[#EB5B00] text-sm font-medium">{children}</div>
 );
 
+// Function to generate a random username
+const generateRandomUsername = () => {
+  const prefix = "user";
+  const randomNum = Math.floor(Math.random() * 100000);
+  return `${prefix}${randomNum}`;
+};
+
 export default function Auth() {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn, signUp } = useAuth();
-  const [authMode, setAuthMode] = useState<"login" | "signup" | "forgot">(
-    "login"
-  );
+  const [authMode, setAuthMode] = useState<
+    "login" | "signup" | "forgot" | "verifying"
+  >("login");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isOnMobile] = useState(isMobile());
   const [emailExists, setEmailExists] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
 
   // Refs for focus management
   const loginFormRef = useRef<HTMLFormElement>(null);
@@ -126,7 +134,6 @@ export default function Auth() {
   const signupForm = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -218,19 +225,22 @@ export default function Auth() {
         throw new Error("Email already registered");
       }
 
-      // Try to sign up directly - Supabase will handle duplicate emails
+      // Generate a random username
+      const randomUsername = generateRandomUsername();
+
+      // Try to sign up directly
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/auth`,
           data: {
-            username: values.username,
+            username: randomUsername, // Store username in metadata
           },
         },
       });
 
       if (signUpError) {
-        // Check for various "already exists" error messages
         const errorMsg = signUpError.message.toLowerCase();
         if (
           errorMsg.includes("already registered") ||
@@ -244,34 +254,23 @@ export default function Auth() {
 
       // If we have a user but email_confirmed_at is null, it's a new signup
       if (data?.user && !data.user.email_confirmed_at) {
-        // Create the profile
-        const { error: insertError } = await supabase.from("profiles").insert([
-          {
+        // Store signup data in localStorage for later profile creation
+        localStorage.setItem(
+          "pendingSignup",
+          JSON.stringify({
             id: data.user.id,
-            username: values.username,
             email: values.email,
-          },
-        ]);
-
-        if (insertError) {
-          // If profile creation fails, we should log out the user
-          await supabase.auth.signOut();
-          throw new Error("Failed to create profile");
-        }
-
-        toast.success(
-          "Please check your email for a confirmation link to complete your registration"
+            username: randomUsername,
+          })
         );
-        setAuthMode("login");
+
+        setVerificationEmail(values.email);
+        setAuthMode("verifying");
+        toast.success("Please check your email to verify your account");
         return;
       }
 
-      // If we get here with a user, it means the email already exists
-      if (data?.user) {
-        throw new Error("Email already registered");
-      } else {
-        throw new Error("Failed to create account");
-      }
+      throw new Error("Failed to create account");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to create account"
@@ -311,13 +310,102 @@ export default function Auth() {
     }
   }, [isOnMobile, authMode]);
 
+  // Add verification view component
+  const VerificationView = () => (
+    <div className="w-full max-w-lg animate-fade-in">
+      <Card className={`bg-card mx-4 ${isOnMobile ? "mt-0" : ""}`}>
+        <CardHeader className="space-y-1 text-center py-8">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <Mail className="h-8 w-8 text-primary" />
+          </div>
+          <CardTitle className="text-2xl md:text-3xl font-bold">
+            Check your email
+          </CardTitle>
+          <CardDescription className="text-base">
+            We've sent a verification link to{" "}
+            <span className="font-medium">{verificationEmail}</span>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 text-center px-6">
+          <div className="flex justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+          <div className="bg-muted p-4 rounded-lg text-sm">
+            <p>
+              Please click the link in the email to verify your account. The
+              page will automatically update once you've verified your email.
+            </p>
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4 pb-8">
+          <Button
+            variant="outline"
+            className="w-full focus:tv-focus"
+            onClick={() => setAuthMode("login")}
+            tabIndex={0}
+          >
+            Back to Sign In
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+
+  // Update auth state change listener to handle profile creation
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session); // Debug log
+
+      if (event === "SIGNED_IN") {
+        // Check if this is a new signup
+        const pendingSignupStr = localStorage.getItem("pendingSignup");
+        if (pendingSignupStr && authMode === "verifying") {
+          try {
+            const pendingSignup = JSON.parse(pendingSignupStr);
+
+            // Create the profile
+            const { error: profileError } = await supabase
+              .from("profiles")
+              .insert([
+                {
+                  id: session.user.id,
+                  username: pendingSignup.username,
+                  email: pendingSignup.email,
+                },
+              ]);
+
+            if (profileError) {
+              console.error("Profile creation error:", profileError);
+              throw profileError;
+            }
+
+            // Clear the pending signup data
+            localStorage.removeItem("pendingSignup");
+
+            toast.success("Account verified successfully!");
+            navigate("/");
+          } catch (error) {
+            console.error("Error creating profile:", error);
+            toast.error("Failed to complete account setup");
+          }
+        }
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate, authMode]);
+
   return (
     <div
       className={`min-h-screen w-screen flex flex-col items-center justify-center bg-gaming p-4 ${
-        isOnMobile ? "pb-20" : "" // Add extra padding at bottom for mobile keyboards
+        isOnMobile ? "pb-20" : ""
       }`}
     >
-      {authMode !== "login" && (
+      {authMode !== "login" && authMode !== "verifying" && (
         <button
           className="fixed top-4 left-4 md:top-8 md:left-8 p-2 rounded-full bg-card hover:bg-muted transition-colors focus:tv-focus"
           onClick={() => setAuthMode("login")}
@@ -329,6 +417,7 @@ export default function Auth() {
         </button>
       )}
 
+      {authMode === "verifying" && <VerificationView />}
       {authMode === "login" && (
         <div className="w-full max-w-lg animate-fade-in">
           <Card className={`bg-card mx-4 ${isOnMobile ? "mt-0" : ""}`}>
@@ -451,7 +540,8 @@ export default function Auth() {
                 Create Account
               </CardTitle>
               <CardDescription className="text-base">
-                Enter your details to create a new account
+                Enter your details to create a new account. You can customize
+                your username later in settings.
               </CardDescription>
             </CardHeader>
             <CardContent
@@ -463,59 +553,35 @@ export default function Auth() {
                   onSubmit={signupForm.handleSubmit(onSignupSubmit)}
                   className="space-y-4"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={signupForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Username</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="johndoe"
-                              {...field}
-                              className="focus:tv-focus-input"
-                              tabIndex={0}
-                              disabled={loading}
-                            />
-                          </FormControl>
-                          <FormErrorMessage>
-                            {signupForm.formState.errors[field.name]?.message}
-                          </FormErrorMessage>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={signupForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="email@example.com"
-                              {...field}
-                              className={`focus:tv-focus-input ${
-                                emailExists ? "border-[#EB5B00]" : ""
-                              }`}
-                              tabIndex={0}
-                              disabled={loading}
-                              onChange={(e) => {
-                                field.onChange(e);
-                                checkEmailExists(e.target.value);
-                              }}
-                            />
-                          </FormControl>
-                          <FormErrorMessage>
-                            {emailExists
-                              ? "Email already registered"
-                              : signupForm.formState.errors[field.name]
-                                  ?.message}
-                          </FormErrorMessage>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={signupForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="email@example.com"
+                            {...field}
+                            className={`focus:tv-focus-input ${
+                              emailExists ? "border-[#EB5B00]" : ""
+                            }`}
+                            tabIndex={0}
+                            disabled={loading}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              checkEmailExists(e.target.value);
+                            }}
+                          />
+                        </FormControl>
+                        <FormErrorMessage>
+                          {emailExists
+                            ? "Email already registered"
+                            : signupForm.formState.errors[field.name]?.message}
+                        </FormErrorMessage>
+                      </FormItem>
+                    )}
+                  />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={signupForm.control}
@@ -688,7 +754,6 @@ export default function Auth() {
     </div>
   );
 }
-
 // Profile Button Component
 const ProfileButton = ({
   name,
